@@ -1,6 +1,8 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
+title: "Building a Supply Chain App"
+date: 2015-01-03 00:00:00 -0000
+categories: CATEGORY-1 CATEGORY-2
 ---
 
 # Welcome
