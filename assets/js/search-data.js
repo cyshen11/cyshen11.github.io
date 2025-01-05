@@ -431,6 +431,17 @@ ninja.data = [{
           window.location.href = "/blog/2015/formatting-and-links/";
         
       },
+    },{id: "post-building-a-simple-supply-chain-web-app",
+      
+        title: "Building a Simple Supply Chain Web App",
+      
+      description: "",
+      section: "Posts",
+      handler: () => {
+        
+          window.location.href = "/building-a-supply-chain-app/";
+        
+      },
     },{id: "news-a-simple-inline-announcement",
           title: 'A simple inline announcement.',
           description: "",
