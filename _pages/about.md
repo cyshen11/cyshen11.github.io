@@ -25,6 +25,7 @@ Three years into my first job, I decided to transition to a data analytics team.
 Since then, I’ve worked in the aerospace, insurance, and supply chain industries. Some of my projects include time-series forecasting, natural language processing (NLP), analytics dashboards, image recognition, and building chatbots.
 
 Random facts
+
 - I am a Stoic
 - I love playing video games—my favorite is _Elden Ring_
 - I know how to play guitar and keyboard

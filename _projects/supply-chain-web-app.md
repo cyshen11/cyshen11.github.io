@@ -237,4 +237,3 @@ Deployment
 - Benjamin Franklin. S, [Streamlit with Nginx: A Step-by-Step Guide to Setting up Your Data App on a Custom Domain](https://medium.com/@linux.franklin/streamlit-with-nginx-a-step-by-step-guide-to-setting-up-your-data-app-on-a-custom-domain-7f5da2d4b3be){:target="\_blank"}
 - Cloudflare, [Origin CA certificates](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/){:target="\_blank"}
 - NGINX, [Configuring HTTPS servers](https://nginx.org/en/docs/http/configuring_https_servers.html){:target="\_blank"}
-
