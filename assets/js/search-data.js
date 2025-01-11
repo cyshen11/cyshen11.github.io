@@ -23,7 +23,12 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/repositories/";
           },
-        },{id: "projects-supply-chain-web-app",
+        },{id: "projects-sharepoint-rag-app",
+          title: 'SharePoint RAG App',
+          description: "Building a simple SharePoint RAG app",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/sharepoint-rag-app/";
+            },},{id: "projects-supply-chain-web-app",
           title: 'Supply Chain Web App',
           description: "Building a simple supply chain web app",
           section: "Projects",handler: () => {
