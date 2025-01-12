@@ -28,6 +28,11 @@ ninja.data = [{
           description: "Building a simple SharePoint RAG app",
           section: "Projects",handler: () => {
               window.location.href = "/projects/sharepoint-rag-app/";
+            },},{id: "projects-sql-database-rag-app",
+          title: 'SQL Database RAG App',
+          description: "Building a simple SQL database RAG app",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/sql-rag-app/";
             },},{id: "projects-supply-chain-web-app",
           title: 'Supply Chain Web App',
           description: "Building a simple supply chain web app",
