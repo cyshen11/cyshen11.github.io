@@ -18,7 +18,7 @@ I wanted to learn more about using LLM to query documents from SharePoint, so I 
 
 ### [GitHub](https://github.com/cyshen11/finance-chatbot){:target="\_blank"}
 
-### [Demo](https://youtu.be/713NxuyyR1E){:target="\_blank"}
+### [Demo](https://youtu.be/ezz6eNPCTYM){:target="\_blank"}
 
 &nbsp;
 

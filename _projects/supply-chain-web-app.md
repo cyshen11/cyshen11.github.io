@@ -18,7 +18,7 @@ I wanted to learn more about data science in supply chain, particularly in inven
 
 ### [GitHub](https://github.com/cyshen11/inventory-management-demand-forecast){:target="\_blank"}
 
-### [Demo](https://youtu.be/2MTh844dtwM){:target="\_blank"}
+### [Demo](https://youtu.be/XVAcwsBzIQ0){:target="\_blank"}
 
 &nbsp;
 

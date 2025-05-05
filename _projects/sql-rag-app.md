@@ -18,7 +18,7 @@ I wanted to learn how to use LLMs to query data from SQL databases, so I decided
 
 ### [GitHub](https://github.com/cyshen11/finance-chatbot/tree/main-sql-chatbot){:target="\_blank"}
 
-### [Demo](https://youtu.be/1e6GVFKZFBQ){:target="\_blank"}
+### [Demo](https://youtu.be/bHhlXm2JrlE){:target="\_blank"}
 
 &nbsp;
 
