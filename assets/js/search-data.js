@@ -23,7 +23,12 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/repositories/";
           },
-        },{id: "projects-sharepoint-rag-app",
+        },{id: "projects-loan-prediction-app",
+          title: 'Loan Prediction App',
+          description: "Building a simple loan prediction web app",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/loan-prediction-app/";
+            },},{id: "projects-sharepoint-rag-app",
           title: 'SharePoint RAG App',
           description: "Building a simple SharePoint RAG app",
           section: "Projects",handler: () => {
