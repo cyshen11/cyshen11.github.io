@@ -4,4 +4,6 @@ github_users:
 repo_description_lines_max: 2
 
 github_repos:
+  - cyshen11/finance-chatbot
   - cyshen11/inventory-management-demand-forecast
+  - cyshen11/loan-prediction-app-aws
