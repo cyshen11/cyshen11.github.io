@@ -23,7 +23,12 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/repositories/";
           },
-        },{id: "projects-loan-prediction-app",
+        },{id: "projects-kafka-chess-app",
+          title: 'Kafka Chess App',
+          description: "Building a web-based chess game with real-time analytics",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/kafka-chess-app/";
+            },},{id: "projects-loan-prediction-app",
           title: 'Loan Prediction App',
           description: "Building a simple loan prediction web app",
           section: "Projects",handler: () => {
