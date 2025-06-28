@@ -153,6 +153,8 @@ GEM
       json (> 0)
     kramdown (2.5.1)
       rexml (>= 3.3.9)
+    kramdown-mermaid (0.1.2)
+      kramdown
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     latex-decode (0.4.0)
@@ -277,6 +279,7 @@ DEPENDENCIES
   jekyll-toc
   jekyll-twitter-plugin
   jemoji
+  kramdown-mermaid
   observer
   ostruct
   terser
