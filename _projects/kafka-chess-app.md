@@ -60,6 +60,7 @@ flowchart TD
 <br>
 
 ## Getting Started
+
 1. Clone the source repository: `git clone https://github.com/cyshen11/kafka-chess.git`.
 2. Create a python environment and install the requirements.txt.
 3. Run `flask --app flaskr run --debug` to run the interactive chessboard and navigate to 127.0.0.1:5000 to view it.
@@ -96,7 +97,7 @@ flowchart TD
 
 Welcome to `kafka-chess`! In this project, we're building a complete chess game that uses some really powerful tools. Think of it like building a complex machine: it has many different parts, and each part has a specific job.
 
-This first chapter introduces you to the **Web Application Backend**. Imagine you're playing chess on your computer. You open your web browser, and *poof!* a chessboard appears. You click on a pawn, and it moves. How does all of this happen? That's exactly what the Web Application Backend helps to manage!
+This first chapter introduces you to the **Web Application Backend**. Imagine you're playing chess on your computer. You open your web browser, and _poof!_ a chessboard appears. You click on a pawn, and it moves. How does all of this happen? That's exactly what the Web Application Backend helps to manage!
 
 <br>
 
@@ -151,10 +152,11 @@ def create_app(test_config=None):
 ```
 
 In this code:
-*   `app = Flask(__name__, ...)` creates our web application.
-*   `@app.route("/")` is like setting up a street sign that says "If you're looking for the main page, come this way!"
-*   `def main():` is the function that runs when someone visits that main page.
-*   `return render_template("index.html", ...)` tells Flask to send the `index.html` file (which contains all the HTML, CSS, and JavaScript for our chessboard) to your web browser. This is how you see the game!
+
+- `app = Flask(__name__, ...)` creates our web application.
+- `@app.route("/")` is like setting up a street sign that says "If you're looking for the main page, come this way!"
+- `def main():` is the function that runs when someone visits that main page.
+- `return render_template("index.html", ...)` tells Flask to send the `index.html` file (which contains all the HTML, CSS, and JavaScript for our chessboard) to your web browser. This is how you see the game!
 
 <br>
 
@@ -179,9 +181,10 @@ producer = Producer(config)
 ```
 
 Here:
-*   We import `Producer` from `confluent_kafka`, which is a library that helps Python talk to Kafka.
-*   `KAFKA_SERVER` tells our producer where to find the Kafka system (usually on `localhost:9092` if you're running it on your own computer).
-*   `producer = Producer(config)` creates the actual "post office worker" object that will send our messages.
+
+- We import `Producer` from `confluent_kafka`, which is a library that helps Python talk to Kafka.
+- `KAFKA_SERVER` tells our producer where to find the Kafka system (usually on `localhost:9092` if you're running it on your own computer).
+- `producer = Producer(config)` creates the actual "post office worker" object that will send our messages.
 
 <br>
 
@@ -197,13 +200,22 @@ First, on the **frontend** (the JavaScript code running in your web browser), wh
 function createMove() {
   const lastMove = game.history({ verbose: true })[0]; // Get details of the last move
   const key = uuid.v4(); // Generate a unique ID for this move
-  const value = '"' + key + '","' + sessionStorage.getItem('gameId') + '","' +
-                'Player' + '","' + 'Pawn from e2 to e4' + '","' + // Example move details
-                toISOStringLocal(new Date()) + '"'; // When the move happened
+  const value =
+    '"' +
+    key +
+    '","' +
+    sessionStorage.getItem("gameId") +
+    '","' +
+    "Player" +
+    '","' +
+    "Pawn from e2 to e4" +
+    '","' + // Example move details
+    toISOStringLocal(new Date()) +
+    '"'; // When the move happened
 
   console.log(value);
   // Send the move data to the backend's /add_move API endpoint
-  axios.post('http://127.0.0.1:5000/add_move/' + key + '/' + value);
+  axios.post("http://127.0.0.1:5000/add_move/" + key + "/" + value);
 }
 ```
 
@@ -229,11 +241,12 @@ def add_move(key, value):
 ```
 
 Here's what happens step-by-step:
-*   `@app.route("/add_move/<key>/<value>", methods=["POST"])` sets up another "street sign." This one says, "If you're sending a POST request to `/add_move` with a `key` and `value`, come this way!"
-*   `def add_move(key, value):` is the function that runs when your browser sends a move. The `key` and `value` from the browser are passed directly into this function.
-*   `topic = "moves"`: Kafka uses "topics" to organize messages, like different departments in a post office. All chess moves go into the `moves` topic.
-*   `producer.produce(topic, value, key, ...)` is the crucial line! This tells our "post office worker" (`producer`) to send the `value` (the move details) to the `topic` (`moves`), using the `key` as an identifier. `on_delivery=delivery_callback` is just a way to check if the message was delivered successfully.
-*   `producer.poll()` and `producer.flush()` ensure that the message is actually sent out immediately.
+
+- `@app.route("/add_move/<key>/<value>", methods=["POST"])` sets up another "street sign." This one says, "If you're sending a POST request to `/add_move` with a `key` and `value`, come this way!"
+- `def add_move(key, value):` is the function that runs when your browser sends a move. The `key` and `value` from the browser are passed directly into this function.
+- `topic = "moves"`: Kafka uses "topics" to organize messages, like different departments in a post office. All chess moves go into the `moves` topic.
+- `producer.produce(topic, value, key, ...)` is the crucial line! This tells our "post office worker" (`producer`) to send the `value` (the move details) to the `topic` (`moves`), using the `key` as an identifier. `on_delivery=delivery_callback` is just a way to check if the message was delivered successfully.
+- `producer.poll()` and `producer.flush()` ensure that the message is actually sent out immediately.
 
 There's also a similar endpoint, `/add_game`, which works in the same way to send information about when a game starts or ends to a different Kafka topic called `games`.
 
@@ -258,6 +271,7 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **User makes a move:** You interact with the visual chessboard.
 2.  **Frontend sends move data:** The JavaScript code on your webpage detects the move and uses `axios.post` to send the details to the backend's `/add_move` endpoint.
 3.  **Backend produces event to Kafka:** The `add_move` function in Flask receives the move data. It doesn't process the game logic itself; instead, it uses the `producer` to send this raw move information into the "moves" topic within Kafka.
@@ -304,11 +318,11 @@ Let's use our familiar example: You, the player, want to move a pawn on the scre
 
 1.  You drag a pawn from `e2` to `e4` with your mouse.
 2.  The `chessboard2.js` library detects this "drag and drop" action.
-3.  It then calls a special function (a "callback") that *we* provide, telling it, "A piece was dropped from 'e2' to 'e4'!"
+3.  It then calls a special function (a "callback") that _we_ provide, telling it, "A piece was dropped from 'e2' to 'e4'!"
 4.  Our special function (which lives in `chess_actions.js`, covered in a later chapter) then checks if this is a legal move using the [Chess Game Engine](05_chess_game_engine_.md).
 5.  If it's legal, our function tells `chessboard2.js` to update its display to show the pawn now on `e4`.
 
-Notice a key point: `chessboard2.js` is only concerned with *showing* things and *reporting* user interactions. It doesn't know the game rules itself. It relies on other parts of our system to tell it what to display.
+Notice a key point: `chessboard2.js` is only concerned with _showing_ things and _reporting_ user interactions. It doesn't know the game rules itself. It relies on other parts of our system to tell it what to display.
 
 <br>
 
@@ -331,30 +345,31 @@ When the `index.html` page loads in your browser, JavaScript code runs to create
 
   // Chessboard Configuration
   const boardConfig = {
-    draggable: true,        // Allow piece dragging
-    onDragStart,           // Function called when drag starts
-    onTouchSquare,         // Function for touch/click interactions
-    onDrop,               // Function called when piece is dropped
-    onSnapEnd,            // Function called after piece animation ends
+    draggable: true, // Allow piece dragging
+    onDragStart, // Function called when drag starts
+    onTouchSquare, // Function for touch/click interactions
+    onDrop, // Function called when piece is dropped
+    onSnapEnd, // Function called after piece animation ends
     position: game.fen(), // Set initial board position from game state
-    touchMove: true       // Enable touch-based moves on mobile
-  }
-  
+    touchMove: true, // Enable touch-based moves on mobile
+  };
+
   // Initialize the visual chessboard in the myBoard div
-  const board = Chessboard2('myBoard', boardConfig)
+  const board = Chessboard2("myBoard", boardConfig);
   // ... (more code)
 </script>
 ```
 
 In this snippet:
 
-*   The `<div id="myBoard"></div>` is a placeholder on your webpage where the chessboard will be drawn.
-*   `boardConfig` is an object (like a shopping list) that tells `chessboard2.js` how we want our board to behave.
-    *   `draggable: true` means you can pick up pieces.
-    *   `position: game.fen()` tells `chessboard2.js` the current state of the game board using a special code called FEN (which the [Chess Game Engine](05_chess_game_engine_.md) understands).
-    *   `onDragStart`, `onTouchSquare`, `onDrop`, and `onSnapEnd` are **callback functions**. These are functions *we write* in another file (`chess_actions.js`, as you'll see in [Chapter 4: Game Interaction Controller](04_game_interaction_controller_.md)). `chessboard2.js` will call these functions when a user performs a specific action (like starting a drag or dropping a piece).
+- The `<div id="myBoard"></div>` is a placeholder on your webpage where the chessboard will be drawn.
+- `boardConfig` is an object (like a shopping list) that tells `chessboard2.js` how we want our board to behave.
 
-*   `const board = Chessboard2('myBoard', boardConfig)` is the line that actually creates the chessboard! It tells the `chessboard2.js` library: "Hey, draw a chessboard inside the `div` with the ID 'myBoard', and use these `boardConfig` settings."
+  - `draggable: true` means you can pick up pieces.
+  - `position: game.fen()` tells `chessboard2.js` the current state of the game board using a special code called FEN (which the [Chess Game Engine](05_chess_game_engine_.md) understands).
+  - `onDragStart`, `onTouchSquare`, `onDrop`, and `onSnapEnd` are **callback functions**. These are functions _we write_ in another file (`chess_actions.js`, as you'll see in [Chapter 4: Game Interaction Controller](04_game_interaction_controller_.md)). `chessboard2.js` will call these functions when a user performs a specific action (like starting a drag or dropping a piece).
+
+- `const board = Chessboard2('myBoard', boardConfig)` is the line that actually creates the chessboard! It tells the `chessboard2.js` library: "Hey, draw a chessboard inside the `div` with the ID 'myBoard', and use these `boardConfig` settings."
 
 <br>
 
@@ -367,43 +382,43 @@ Let's look at a simplified `onDrop` function:
 ```javascript
 // In flaskr/static/js/chess_actions.js (simplified)
 
-function onDrop (dropEvt) {
+function onDrop(dropEvt) {
   // 1. Try to make the move using the Chess Game Engine (chess.js)
   const move = game.move({
     from: dropEvt.source, // Where the piece came from (e.g., 'e2')
-    to: dropEvt.target,   // Where the piece was dropped (e.g., 'e4')
-    promotion: 'q'        // (simplified) always promote to a Queen
-  })
+    to: dropEvt.target, // Where the piece was dropped (e.g., 'e4')
+    promotion: "q", // (simplified) always promote to a Queen
+  });
 
   // 2. If the move was legal (chess.js returned a result)
   if (move) {
     // 3. Tell chessboard2.js to update its visual position
     board.position(game.fen()).then(() => {
       // 4. Update other game elements (like move history)
-      updatePGN()
-      updateStatus()
+      updatePGN();
+      updateStatus();
 
       // 5. (Later chapters) send move to backend for Kafka
-      createMove() // Sends move to Flask backend (Chapter 1)
-      
+      createMove(); // Sends move to Flask backend (Chapter 1)
+
       // Make a random move for the AI (for single-player demo)
-      window.setTimeout(makeRandomMove, 250)
-    })
+      window.setTimeout(makeRandomMove, 250);
+    });
   } else {
     // If the move was illegal, snap the piece back to its original square
-    return 'snapback'
+    return "snapback";
   }
 }
 ```
 
 In this code:
 
-*   The `onDrop` function receives `dropEvt` (an event object) from `chessboard2.js`. This object contains `source` (the starting square) and `target` (the ending square).
-*   `game.move(...)` is a function from the [Chess Game Engine](05_chess_game_engine_.md) (`chess.js`). This is where the *actual chess rules* are checked.
-*   If `game.move()` returns a valid `move` (meaning the move was legal), then:
-    *   `board.position(game.fen())` tells `chessboard2.js` to redraw the board to the *new* game state (provided by `game.fen()`). This visually updates the board.
-    *   `updatePGN()` and `updateStatus()` update the text you see on the page.
-    *   `createMove()` (as we saw in [Chapter 1: Web Application Backend](01_web_application_backend_.md)) sends the move data to our Flask backend, which then pushes it to Kafka.
+- The `onDrop` function receives `dropEvt` (an event object) from `chessboard2.js`. This object contains `source` (the starting square) and `target` (the ending square).
+- `game.move(...)` is a function from the [Chess Game Engine](05_chess_game_engine_.md) (`chess.js`). This is where the _actual chess rules_ are checked.
+- If `game.move()` returns a valid `move` (meaning the move was legal), then:
+  - `board.position(game.fen())` tells `chessboard2.js` to redraw the board to the _new_ game state (provided by `game.fen()`). This visually updates the board.
+  - `updatePGN()` and `updateStatus()` update the text you see on the page.
+  - `createMove()` (as we saw in [Chapter 1: Web Application Backend](01_web_application_backend_.md)) sends the move data to our Flask backend, which then pushes it to Kafka.
 
 <br>
 
@@ -697,13 +712,14 @@ You've now learned about the **Streamlit Analytics Dashboard**. It's our real-ti
 Next, we'll dive into the [Game Interaction Controller](04_game_interaction_controller_.md), which acts as the "middleman" between your clicks on the chessboard and the game's core logic.
 
 ---
+
 <br>
 
 # Chapter 4: Game Interaction Controller
 
 Welcome back! In [Chapter 2: Interactive Chessboard](02_interactive_chessboard_.md), we explored how the `chessboard2.js` library draws the board and lets you click or drag pieces. We also touched on how it sends signals (like `onDrop` or `onTouchSquare`) when you interact. Then, in [Chapter 1: Web Application Backend](01_web_application_backend_.md), we learned how our Flask backend acts as a "post office," ready to receive these game events and send them to Kafka.
 
-But there's a missing piece! When you drag a piece on the visual board, how does the system know if it's a *legal* chess move? And if it is, how does that legal move get communicated to the backend to be sent to Kafka?
+But there's a missing piece! When you drag a piece on the visual board, how does the system know if it's a _legal_ chess move? And if it is, how does that legal move get communicated to the backend to be sent to Kafka?
 
 This is where the **Game Interaction Controller** comes in! Think of it as the "player's assistant" or the "traffic cop" for your chess moves.
 
@@ -730,9 +746,9 @@ Let's use our familiar example: You, the player, try to move a pawn from `e2` to
 3.  The Game Interaction Controller takes the `e2` and `e4` information and asks the [Chess Game Engine](05_chess_game_engine_.md) (`chess.js`), "Is moving a pawn from `e2` to `e4` a legal move right now?"
 4.  The [Chess Game Engine](05_chess_game_engine_.md) checks its rules and says, "Yes, that's a legal move!"
 5.  The Game Interaction Controller then:
-    *   Tells the visual board (`chessboard2.js`) to *permanently* show the pawn on `e4`.
-    *   Updates the text on the screen (like "White to move" or "Check!").
-    *   Tells the [Web Application Backend](01_web_application_backend_.md) to record this move by sending it to Kafka.
+    - Tells the visual board (`chessboard2.js`) to _permanently_ show the pawn on `e4`.
+    - Updates the text on the screen (like "White to move" or "Check!").
+    - Tells the [Web Application Backend](01_web_application_backend_.md) to record this move by sending it to Kafka.
 
 If the move wasn't legal (e.g., trying to move a pawn sideways), the Game Interaction Controller would tell the visual board to "snap back" the piece to its original square.
 
@@ -756,19 +772,20 @@ const game = new Chess(); // This is our Chess Game Engine!
 
 // Chessboard Configuration
 const boardConfig = {
-  draggable: true,        // Allow piece dragging
-  onDragStart,           // Function called when drag starts
-  onDrop,               // Function called when piece is dropped
+  draggable: true, // Allow piece dragging
+  onDragStart, // Function called when drag starts
+  onDrop, // Function called when piece is dropped
   // ... other callbacks
-}
+};
 
 // Initialize the visual chessboard
-const board = Chessboard2('myBoard', boardConfig) // This is our Interactive Chessboard!
+const board = Chessboard2("myBoard", boardConfig); // This is our Interactive Chessboard!
 ```
 
 Here:
-*   `const game = new Chess();` creates an object that understands all the rules of chess. This is our direct link to the [Chess Game Engine](05_chess_game_engine_.md).
-*   `const board = Chessboard2('myBoard', boardConfig)` creates the visual board. Notice `onDragStart` and `onDrop` are listed in `boardConfig`. These tell `chessboard2.js` *which functions to call* in `chess_actions.js` when the user drags or drops a piece. The `board` object also has functions like `board.position()` that the GIC will use to update the visual board.
+
+- `const game = new Chess();` creates an object that understands all the rules of chess. This is our direct link to the [Chess Game Engine](05_chess_game_engine_.md).
+- `const board = Chessboard2('myBoard', boardConfig)` creates the visual board. Notice `onDragStart` and `onDrop` are listed in `boardConfig`. These tell `chessboard2.js` _which functions to call_ in `chess_actions.js` when the user drags or drops a piece. The `board` object also has functions like `board.position()` that the GIC will use to update the visual board.
 
 <br>
 
@@ -779,44 +796,45 @@ When you drag a piece and drop it, `chessboard2.js` calls the `onDrop` function 
 ```javascript
 // In flaskr/static/js/chess_actions.js (simplified)
 
-function onDrop (dropEvt) {
+function onDrop(dropEvt) {
   // 1. Try to make the move using the Chess Game Engine (chess.js)
   const move = game.move({
     from: dropEvt.source, // Where the piece came from (e.g., 'e2')
-    to: dropEvt.target,   // Where the piece was dropped (e.g., 'e4')
-    promotion: 'q'        // (for simplicity) always promote to a Queen
-  })
+    to: dropEvt.target, // Where the piece was dropped (e.g., 'e4')
+    promotion: "q", // (for simplicity) always promote to a Queen
+  });
 
   // 2. If the move was legal (chess.js returned a result)
   if (move) {
     // 3. Tell chessboard2.js to update its visual position
     board.position(game.fen()).then(() => {
       // 4. Update other game elements (like move history & status)
-      updatePGN()
-      updateStatus()
+      updatePGN();
+      updateStatus();
 
       // 5. Send the valid move to the backend for Kafka
-      createMove() // Sends move to Flask backend (Chapter 1)
-      
+      createMove(); // Sends move to Flask backend (Chapter 1)
+
       // Make AI move (for demo purposes)
-      window.setTimeout(makeRandomMove, 250)
-    })
+      window.setTimeout(makeRandomMove, 250);
+    });
   } else {
     // If the move was illegal, snap the piece back to its original square
-    return 'snapback'
+    return "snapback";
   }
 }
 ```
 
 Let's break down this simplified `onDrop` function:
-*   `function onDrop (dropEvt)`: This function is called by `chessboard2.js`. It receives `dropEvt`, which contains details like `dropEvt.source` (the starting square like 'e2') and `dropEvt.target` (the ending square like 'e4').
-*   `game.move(...)`: This is the crucial line! It asks the [Chess Game Engine](05_chess_game_engine_.md) (`chess.js`) if the move from `dropEvt.source` to `dropEvt.target` is valid. If it is, `game.move()` makes the move internally and returns information about it. If it's *not* valid, it returns `null`.
-*   `if (move)`: This checks if the move was legal.
-    *   If `true` (legal):
-        *   `board.position(game.fen())`: The GIC tells the `board` object (our [Interactive Chessboard](02_interactive_chessboard_.md)) to redraw itself to match the *new* state of the `game` (represented by `game.fen()`, a special chess notation).
-        *   `updatePGN()` and `updateStatus()`: These (other functions in `chess_actions.js`) update the text on the page, like the move history or game status.
-        *   `createMove()`: This function, also part of `chess_actions.js`, is called to send the move data to our [Web Application Backend](01_web_application_backend_.md), which then sends it to Kafka.
-    *   If `false` (illegal): `return 'snapback'` tells `chessboard2.js` to visually return the piece to its original square.
+
+- `function onDrop (dropEvt)`: This function is called by `chessboard2.js`. It receives `dropEvt`, which contains details like `dropEvt.source` (the starting square like 'e2') and `dropEvt.target` (the ending square like 'e4').
+- `game.move(...)`: This is the crucial line! It asks the [Chess Game Engine](05_chess_game_engine_.md) (`chess.js`) if the move from `dropEvt.source` to `dropEvt.target` is valid. If it is, `game.move()` makes the move internally and returns information about it. If it's _not_ valid, it returns `null`.
+- `if (move)`: This checks if the move was legal.
+  - If `true` (legal):
+    - `board.position(game.fen())`: The GIC tells the `board` object (our [Interactive Chessboard](02_interactive_chessboard_.md)) to redraw itself to match the _new_ state of the `game` (represented by `game.fen()`, a special chess notation).
+    - `updatePGN()` and `updateStatus()`: These (other functions in `chess_actions.js`) update the text on the page, like the move history or game status.
+    - `createMove()`: This function, also part of `chess_actions.js`, is called to send the move data to our [Web Application Backend](01_web_application_backend_.md), which then sends it to Kafka.
+  - If `false` (illegal): `return 'snapback'` tells `chessboard2.js` to visually return the piece to its original square.
 
 <br>
 
@@ -832,24 +850,37 @@ function createMove() {
   const lastMove = moves[moves.length - 1]; // Get details of the very last move
 
   const key = uuid.v4(); // Generate a unique ID for this move
-  const player = lastMove.color == 'w' ? 'Player' : 'AI'; // Who made the move?
-  const moveDetails = `${getPieceName(lastMove.piece)} from ${lastMove.from} to ${lastMove.to}`; // Formatted move
-  
+  const player = lastMove.color == "w" ? "Player" : "AI"; // Who made the move?
+  const moveDetails = `${getPieceName(lastMove.piece)} from ${
+    lastMove.from
+  } to ${lastMove.to}`; // Formatted move
+
   // Construct the data to send (as a string, simple for this example)
-  const value = '"' + key + '","' + sessionStorage.getItem('gameId') + '","' + 
-                player + '","' + moveDetails + '","' + toISOStringLocal(new Date()) + '"';
-  
+  const value =
+    '"' +
+    key +
+    '","' +
+    sessionStorage.getItem("gameId") +
+    '","' +
+    player +
+    '","' +
+    moveDetails +
+    '","' +
+    toISOStringLocal(new Date()) +
+    '"';
+
   console.log(value);
   // Send the move data to the backend's /add_move API endpoint using Axios
-  axios.post('http://127.0.0.1:5000/add_move/' + key + '/' + value);
+  axios.post("http://127.0.0.1:5000/add_move/" + key + "/" + value);
 }
 ```
 
 Here:
-*   `const lastMove = ...`: We get the details of the move that *just happened* from the `game` object (our [Chess Game Engine](05_chess_game_engine_.md)).
-*   `const key = uuid.v4();`: A unique ID is generated for each move.
-*   `const value = ...`: The GIC formats all the important details about the move (game ID, player, move description, timestamp) into a single string. This is the "letter" we're going to send.
-*   `axios.post(...)`: This line sends an HTTP POST request to our [Web Application Backend](01_web_application_backend_.md). It calls the `/add_move` endpoint we saw in [Chapter 1: Web Application Backend](01_web_application_backend_.md), passing the `key` and `value` of the move. The backend then takes this information and publishes it to Kafka.
+
+- `const lastMove = ...`: We get the details of the move that _just happened_ from the `game` object (our [Chess Game Engine](05_chess_game_engine_.md)).
+- `const key = uuid.v4();`: A unique ID is generated for each move.
+- `const value = ...`: The GIC formats all the important details about the move (game ID, player, move description, timestamp) into a single string. This is the "letter" we're going to send.
+- `axios.post(...)`: This line sends an HTTP POST request to our [Web Application Backend](01_web_application_backend_.md). It calls the `/add_move` endpoint we saw in [Chapter 1: Web Application Backend](01_web_application_backend_.md), passing the `key` and `value` of the move. The backend then takes this information and publishes it to Kafka.
 
 There's also an `onTouchSquare` function that handles moves made by clicking squares instead of dragging. Its logic is a bit more complex as it manages "pending moves" (where you click a piece, then click a destination square), but it follows the same core idea: ask `game.move()` for legality, then update `board.position()` and call `createMove()`.
 
@@ -882,6 +913,7 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **User Interacts:** You drag a piece on the visual chessboard.
 2.  **Interactive Chessboard Notifies:** `chessboard2.js` detects the drag-and-drop and calls the `onDrop` function in the Game Interaction Controller.
 3.  **Game Interaction Controller Consults Engine:** The `onDrop` function immediately asks the `game` object (the [Chess Game Engine](05_chess_game_engine_.md)) if the move is legal.
@@ -920,10 +952,10 @@ Think of the Chess Game Engine as the **official arbiter** of all chess rules. I
 
 Here's what it knows:
 
-*   **Piece Movements:** How each type of piece (pawn, knight, bishop, rook, queen, king) is allowed to move.
-*   **Captures:** How pieces capture each other.
-*   **Special Moves:** Complex rules like castling, en passant, and pawn promotion.
-*   **Game State:** What constitutes a check, checkmate, or a draw.
+- **Piece Movements:** How each type of piece (pawn, knight, bishop, rook, queen, king) is allowed to move.
+- **Captures:** How pieces capture each other.
+- **Special Moves:** Complex rules like castling, en passant, and pawn promotion.
+- **Game State:** What constitutes a check, checkmate, or a draw.
 
 When a player (or the AI) tries to make a move, the Chess Game Engine is asked: "Is this move legal from the current board position?" It then checks all the rules and responds with a clear "Yes, that's legal!" or "No, that's not allowed." If the move is legal, it updates its internal record of the board's state.
 
@@ -972,13 +1004,13 @@ When you drop a piece on the board, the `onDrop` function (part of our [Game Int
 ```javascript
 // In flaskr/static/js/chess_actions.js (simplified onDrop function)
 
-function onDrop (dropEvt) {
+function onDrop(dropEvt) {
   // 1. Try to make the move using the Chess Game Engine (chess.js)
   const move = game.move({
     from: dropEvt.source, // e.g., 'e2'
-    to: dropEvt.target,   // e.g., 'e4'
-    promotion: 'q'        // (simplified) always promote to a Queen
-  })
+    to: dropEvt.target, // e.g., 'e4'
+    promotion: "q", // (simplified) always promote to a Queen
+  });
 
   // 2. Check if the move was legal
   if (move) {
@@ -987,15 +1019,16 @@ function onDrop (dropEvt) {
     // ...
   } else {
     // Move was illegal!
-    return 'snapback' // Tell the visual board to return the piece
+    return "snapback"; // Tell the visual board to return the piece
   }
 }
 ```
 
 In this code snippet:
-*   `game.move({ from: dropEvt.source, to: dropEvt.target, ... })` is how we ask the Chess Game Engine to *try* to make a move.
-*   If the move is **legal**, `game.move()` performs the move internally (changes the engine's record of the board state) and returns a `move` object (containing details about the move).
-*   If the move is **illegal**, `game.move()` does *not* change the internal board state and returns `null`. This allows our [Game Interaction Controller](04_game_interaction_controller_.md) to decide what to do next (e.g., snap the piece back).
+
+- `game.move({ from: dropEvt.source, to: dropEvt.target, ... })` is how we ask the Chess Game Engine to _try_ to make a move.
+- If the move is **legal**, `game.move()` performs the move internally (changes the engine's record of the board state) and returns a `move` object (containing details about the move).
+- If the move is **illegal**, `game.move()` does _not_ change the internal board state and returns `null`. This allows our [Game Interaction Controller](04_game_interaction_controller_.md) to decide what to do next (e.g., snap the piece back).
 
 <br>
 
@@ -1010,12 +1043,13 @@ After a legal move is made, the Chess Game Engine's internal representation of t
 // 3. Tell chessboard2.js to update its visual position
 board.position(game.fen()).then(() => {
   // ... (update other elements, send to backend)
-})
+});
 ```
 
 Here:
-*   `game.fen()` is a powerful function provided by `chess.js`. It returns the current state of the board as a single string using a standard notation called **FEN** (Forsyth-Edwards Notation). This string contains all the necessary information: piece positions, whose turn it is, castling rights, en passant square, halfmove clock, and fullmove number.
-*   The [Interactive Chessboard](02_interactive_chessboard_.md) (`board.position(...)`) then uses this FEN string to redraw the visual board to match the engine's state.
+
+- `game.fen()` is a powerful function provided by `chess.js`. It returns the current state of the board as a single string using a standard notation called **FEN** (Forsyth-Edwards Notation). This string contains all the necessary information: piece positions, whose turn it is, castling rights, en passant square, halfmove clock, and fullmove number.
+- The [Interactive Chessboard](02_interactive_chessboard_.md) (`board.position(...)`) then uses this FEN string to redraw the visual board to match the engine's state.
 
 <br>
 
@@ -1026,20 +1060,23 @@ The Chess Game Engine also provides functions to check the overall status of the
 ```javascript
 // In flaskr/static/js/chess_actions.js (simplified updateStatus function)
 
-function updateStatus () {
-  let statusHTML = '';
+function updateStatus() {
+  let statusHTML = "";
 
-  if (!game.game_over()) { // Is the game still ongoing?
-    if (game.in_check()) statusHTML = ' is in check! '; // Is someone in check?
+  if (!game.game_over()) {
+    // Is the game still ongoing?
+    if (game.in_check()) statusHTML = " is in check! "; // Is someone in check?
     // ...
-  } else if (game.in_checkmate()) { // Is it checkmate?
-    statusHTML = 'Game over: ... is in checkmate.'
-  } else if (game.in_stalemate()) { // Is it a stalemate?
-    statusHTML = 'Game is drawn. ... is stalemated.'
+  } else if (game.in_checkmate()) {
+    // Is it checkmate?
+    statusHTML = "Game over: ... is in checkmate.";
+  } else if (game.in_stalemate()) {
+    // Is it a stalemate?
+    statusHTML = "Game is drawn. ... is stalemated.";
   }
   // ... other draw conditions like game.in_threefold_repetition(), game.insufficient_material(), game.in_draw()
 
-  document.getElementById('gameStatus').innerHTML = statusHTML
+  document.getElementById("gameStatus").innerHTML = statusHTML;
 }
 ```
 
@@ -1073,15 +1110,16 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **User initiates move:** You drag a piece on the visual board.
 2.  **Interactive Chessboard notifies:** `chessboard2.js` (Interactive Chessboard) detects the drag and drop and calls the `onDrop` function in `chess_actions.js` (Game Interaction Controller).
 3.  **Game Interaction Controller asks the Engine:** The `onDrop` function calls `game.move()` on the `Chess` object, providing the source and target squares. This is the moment it asks the Chess Game Engine: "Is this move allowed?"
 4.  **Chess Game Engine processes:** The `chess.js` library (Chess Game Engine) performs all its complex rule checks.
-    *   **If Legal:** It updates its own internal board state to reflect the move and returns a `move` object to the [Game Interaction Controller](04_game_interaction_controller_.md).
-    *   **If Illegal:** It leaves its internal board state unchanged and returns `null` to the [Game Interaction Controller](04_game_interaction_controller_.md).
+    - **If Legal:** It updates its own internal board state to reflect the move and returns a `move` object to the [Game Interaction Controller](04_game_interaction_controller_.md).
+    - **If Illegal:** It leaves its internal board state unchanged and returns `null` to the [Game Interaction Controller](04_game_interaction_controller_.md).
 5.  **Game Interaction Controller reacts:**
-    *   **If Legal:** It then tells the [Interactive Chessboard](02_interactive_chessboard_.md) to visually update using `board.position(game.fen())`, as the engine's internal state has changed.
-    *   **If Illegal:** It tells the [Interactive Chessboard](02_interactive_chessboard_.md) to 'snapback' the piece, as the engine did not accept the move.
+    - **If Legal:** It then tells the [Interactive Chessboard](02_interactive_chessboard_.md) to visually update using `board.position(game.fen())`, as the engine's internal state has changed.
+    - **If Illegal:** It tells the [Interactive Chessboard](02_interactive_chessboard_.md) to 'snapback' the piece, as the engine did not accept the move.
 
 <br>
 
@@ -1090,11 +1128,12 @@ In this flow:
 While we don't write the `chess.js` library ourselves, it's helpful to know that it contains thousands of lines of JavaScript code specifically designed to handle every possible chess scenario. It's a highly optimized and thoroughly tested set of algorithms.
 
 For example, when `game.move()` is called, internally, the `chess.js` library might perform steps like:
-*   `generate_moves()`: Calculates all *pseudo-legal* moves for the current player (moves that follow piece movement rules, but might leave the king in check).
-*   `attacked()`: Checks if a specific square is currently under attack by the opposing player's pieces. This is crucial for determining if a king is in check.
-*   `king_attacked()`: A special check to see if the *current player's king* is attacked after a move. If so, that move is illegal.
-*   `make_move()`: If a move is legal, this function actually updates the internal 0x88 board representation (a clever way `chess.js` stores the board) by moving the piece, handling captures, castling, en passant, etc.
-*   `undo_move()`: A vital function for "trying out" moves to see if they result in check, and then reverting the board state.
+
+- `generate_moves()`: Calculates all _pseudo-legal_ moves for the current player (moves that follow piece movement rules, but might leave the king in check).
+- `attacked()`: Checks if a specific square is currently under attack by the opposing player's pieces. This is crucial for determining if a king is in check.
+- `king_attacked()`: A special check to see if the _current player's king_ is attacked after a move. If so, that move is illegal.
+- `make_move()`: If a move is legal, this function actually updates the internal 0x88 board representation (a clever way `chess.js` stores the board) by moving the piece, handling captures, castling, en passant, etc.
+- `undo_move()`: A vital function for "trying out" moves to see if they result in check, and then reverting the board state.
 
 You can see these functions referenced in the `flaskr/static/js/chess.js` file, though their internal logic is quite complex. The key takeaway is that `chess.js` handles all the intricate details so we don't have to! We just use its public functions like `game.move()`, `game.fen()`, and `game.in_check()`.
 
@@ -1114,7 +1153,7 @@ Next, we'll explore how all the different parts of our `kafka-chess` system comm
 
 Welcome back! In [Chapter 5: Chess Game Engine](05_chess_game_engine_.md), we learned how `chess.js` acts as the "brain" of our game, understanding all the complex rules. We also saw in [Chapter 4: Game Interaction Controller](04_game_interaction_controller_.md) how it validates your moves, and if a move is legal, it tells the [Web Application Backend](01_web_application_backend_.md) to record it.
 
-But how does this "recording" work behind the scenes? And more importantly, if the backend just "records" a move, how do other parts of our system, like the [Streamlit Analytics Dashboard](03_streamlit_analytics_dashboard_.md), know about that move *instantly* without being directly connected to the game? This is a challenge!
+But how does this "recording" work behind the scenes? And more importantly, if the backend just "records" a move, how do other parts of our system, like the [Streamlit Analytics Dashboard](03_streamlit_analytics_dashboard_.md), know about that move _instantly_ without being directly connected to the game? This is a challenge!
 
 Imagine you're trying to send a letter to many different friends, but you don't want to write a separate letter for each one. You want a single place where you can drop off your letter, and then anyone who cares about what you wrote can pick it up. This is exactly the problem that the **Kafka Event Bus** solves!
 
@@ -1167,16 +1206,17 @@ services:
     hostname: broker
     container_name: broker
     ports:
-      - '9092:9092' # This makes Kafka available on your computer at port 9092
+      - "9092:9092" # This makes Kafka available on your computer at port 9092
     environment:
       # ... other Kafka settings (like where it stores data, how it communicates)
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT_HOST://localhost:9092,PLAINTEXT://broker:19092'
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT_HOST://localhost:9092,PLAINTEXT://broker:19092"
 ```
 
 In this snippet:
-*   `image: apache/kafka:latest` tells Docker to download and use the latest version of Kafka.
-*   `ports: - '9092:9092'` is very important! It means that whatever traffic goes to port `9092` on *your computer* will be sent to port `9092` *inside the Kafka container*. This is how our other applications (like Flask) can connect to Kafka using `localhost:9092`.
-*   `KAFKA_ADVERTISED_LISTENERS` is like Kafka announcing its address so other applications know where to send messages. Here, `localhost:9092` is the address other applications outside the Docker network will use.
+
+- `image: apache/kafka:latest` tells Docker to download and use the latest version of Kafka.
+- `ports: - '9092:9092'` is very important! It means that whatever traffic goes to port `9092` on _your computer_ will be sent to port `9092` _inside the Kafka container_. This is how our other applications (like Flask) can connect to Kafka using `localhost:9092`.
+- `KAFKA_ADVERTISED_LISTENERS` is like Kafka announcing its address so other applications know where to send messages. Here, `localhost:9092` is the address other applications outside the Docker network will use.
 
 This `docker-compose.yml` file effectively sets up the entire "post office building" for our event bus.
 
@@ -1205,8 +1245,9 @@ producer = Producer(config)
 ```
 
 Here:
-*   `Producer(config)` creates a special object that knows how to send messages to Kafka.
-*   `bootstrap.servers` is the key setting that tells the producer *where* to find Kafka (using the `localhost:9092` address we exposed in `docker-compose.yml`).
+
+- `Producer(config)` creates a special object that knows how to send messages to Kafka.
+- `bootstrap.servers` is the key setting that tells the producer _where_ to find Kafka (using the `localhost:9092` address we exposed in `docker-compose.yml`).
 
 Once the producer is set up, the Flask backend can send a message whenever a move or game event happens.
 
@@ -1219,7 +1260,7 @@ def add_move(key, value):
 
     # Use our Kafka producer to send the message
     # value is the actual move data, key is a unique ID
-    producer.produce(topic, value, key) 
+    producer.produce(topic, value, key)
 
     # Make sure the message is sent before continuing
     producer.poll(10000)
@@ -1229,9 +1270,10 @@ def add_move(key, value):
 ```
 
 In this code:
-*   `topic = "moves"`: This specifies which "mailbox" or "department" in Kafka this message belongs to.
-*   `producer.produce(topic, value, key)`: This is the critical line! It tells our `producer` to put the `value` (the move details) into the `moves` `topic`, using `key` as a unique identifier for that message.
-*   `producer.poll()` and `producer.flush()`: These lines ensure the message is actually sent out and confirmed by Kafka before the backend finishes its job.
+
+- `topic = "moves"`: This specifies which "mailbox" or "department" in Kafka this message belongs to.
+- `producer.produce(topic, value, key)`: This is the critical line! It tells our `producer` to put the `value` (the move details) into the `moves` `topic`, using `key` as a unique identifier for that message.
+- `producer.poll()` and `producer.flush()`: These lines ensure the message is actually sent out and confirmed by Kafka before the backend finishes its job.
 
 The `add_game` route works in a very similar way, but it sends game start/end events to the `games` topic instead.
 
@@ -1287,11 +1329,12 @@ class TableEnvCustomized:
 ```
 
 Here:
-*   `CREATE TABLE games (...) WITH (...)`: This is a special SQL command telling Flink to set up a "virtual table" that is actually linked to a Kafka topic.
-*   `'connector' = 'kafka'`: This explicitly tells Flink, "I want to connect to Kafka!"
-*   `'topic' = 'games'` (or `'moves'`): This tells Flink *which specific Kafka topic* to listen to. Flink will only receive messages from this topic.
-*   `'properties.bootstrap.servers' = 'localhost:9092'`: Again, this is the address where Flink knows to find our Kafka "post office."
-*   `'value.format' = 'csv'`: This tells Flink how to understand the data inside the messages (we're sending them as simple comma-separated values).
+
+- `CREATE TABLE games (...) WITH (...)`: This is a special SQL command telling Flink to set up a "virtual table" that is actually linked to a Kafka topic.
+- `'connector' = 'kafka'`: This explicitly tells Flink, "I want to connect to Kafka!"
+- `'topic' = 'games'` (or `'moves'`): This tells Flink _which specific Kafka topic_ to listen to. Flink will only receive messages from this topic.
+- `'properties.bootstrap.servers' = 'localhost:9092'`: Again, this is the address where Flink knows to find our Kafka "post office."
+- `'value.format' = 'csv'`: This tells Flink how to understand the data inside the messages (we're sending them as simple comma-separated values).
 
 Once these "source tables" are created, Flink can then start reading the incoming messages as a continuous stream of data, ready to perform analytics on them.
 
@@ -1317,6 +1360,7 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **Backend Publishes:** When you make a move, the [Web Application Backend](01_web_application_backend_.md) sends that move as a message (an "event") to the [Kafka Event Bus](06_kafka_event_bus_.md), specifically to the `moves` topic.
 2.  **Kafka Acknowledges:** Kafka confirms it has received and stored the message safely.
 3.  **Flink Consumes:** The [Flink Analytics Engine](07_flink_analytics_engine_.md) is constantly "listening" to the `moves` topic in Kafka. As soon as a new message arrives, Flink automatically picks it up.
@@ -1350,7 +1394,7 @@ This is where the **Flink Analytics Engine** comes in!
 
 ## What is the Flink Analytics Engine?
 
-Imagine you have a super-smart **data scientist** who works tirelessly, day and night, watching every single piece of information that flows through Kafka. This data scientist's job isn't to play chess, but to constantly look for patterns, count things, and summarize what's happening *right now* in all the games.
+Imagine you have a super-smart **data scientist** who works tirelessly, day and night, watching every single piece of information that flows through Kafka. This data scientist's job isn't to play chess, but to constantly look for patterns, count things, and summarize what's happening _right now_ in all the games.
 
 The **Flink Analytics Engine** is our project's version of that tireless data scientist. It uses **Apache Flink**, a powerful tool designed for real-time data processing.
 
@@ -1372,8 +1416,8 @@ The Flink Analytics Engine is constantly doing the work:
 
 1.  It's always connected to Kafka, receiving every new move and game event.
 2.  It runs continuous calculations in the background:
-    *   "How many unique game IDs have started but not yet ended?" (for active games)
-    *   "What are the last N entries in the `moves` stream?" (for recent moves)
+    - "How many unique game IDs have started but not yet ended?" (for active games)
+    - "What are the last N entries in the `moves` stream?" (for recent moves)
 3.  It then provides these updated results to the dashboard, ensuring you always see the latest information.
 
 <br>
@@ -1407,8 +1451,9 @@ class TableEnvCustomized:
 ```
 
 In this code:
-*   `TableEnvironment.create(EnvironmentSettings.in_streaming_mode())` creates the special Flink environment designed for continuous, real-time data processing (streaming).
-*   `self.table_env.get_config().set("pipeline.jars", ...)` is a crucial line. It tells Flink, "To connect to Kafka, you'll need this special tool (JAR file)." This JAR file is downloaded separately and its path is set as an environment variable in our setup.
+
+- `TableEnvironment.create(EnvironmentSettings.in_streaming_mode())` creates the special Flink environment designed for continuous, real-time data processing (streaming).
+- `self.table_env.get_config().set("pipeline.jars", ...)` is a crucial line. It tells Flink, "To connect to Kafka, you'll need this special tool (JAR file)." This JAR file is downloaded separately and its path is set as an environment variable in our setup.
 
 <br>
 
@@ -1457,11 +1502,12 @@ Next, our Flink "data scientist" needs to understand the structure of the data c
 ```
 
 In this code:
-*   `CREATE TABLE ... WITH (...)` is a SQL-like command that registers a new "table" within Flink. But this isn't a normal table; it's a **streaming table** that represents our Kafka data.
-*   `'connector' = 'kafka'` explicitly tells Flink to use the Kafka connector we linked earlier.
-*   `'topic' = 'games'` (or `'moves'`) specifies which Kafka topic Flink should continuously read messages from.
-*   `'properties.bootstrap.servers' = 'localhost:9092'` is the address of our [Kafka Event Bus](06_kafka_event_bus_.md).
-*   `'value.format' = 'csv'` indicates that the data arriving in Kafka is in a simple comma-separated format.
+
+- `CREATE TABLE ... WITH (...)` is a SQL-like command that registers a new "table" within Flink. But this isn't a normal table; it's a **streaming table** that represents our Kafka data.
+- `'connector' = 'kafka'` explicitly tells Flink to use the Kafka connector we linked earlier.
+- `'topic' = 'games'` (or `'moves'`) specifies which Kafka topic Flink should continuously read messages from.
+- `'properties.bootstrap.servers' = 'localhost:9092'` is the address of our [Kafka Event Bus](06_kafka_event_bus_.md).
+- `'value.format' = 'csv'` indicates that the data arriving in Kafka is in a simple comma-separated format.
 
 After these commands run, Flink is now actively listening to both the `games` and `moves` Kafka topics, ready to process the data as it arrives.
 
@@ -1480,11 +1526,11 @@ Here's how we get the count of active and completed games:
         """Get count of active and completed games."""
         with self.table_env.execute_sql(
             """
-      SELECT 
+      SELECT
         SUM(CASE WHEN record_count = 1 THEN 1 ELSE 0 END) active_game_count
         ,SUM(CASE WHEN record_count = 2 THEN 1 ELSE 0 END) completed_game_count
       FROM (
-        SELECT game_id, COUNT(*) record_count FROM games 
+        SELECT game_id, COUNT(*) record_count FROM games
         GROUP BY game_id
       )
       """
@@ -1494,11 +1540,12 @@ Here's how we get the count of active and completed games:
 ```
 
 Explanation:
-*   `self.table_env.execute_sql(...)` tells Flink to run a SQL query.
-*   The inner `SELECT game_id, COUNT(*) record_count FROM games GROUP BY game_id` counts how many events (`start_time` and `end_time`) exist for each `game_id`. A game that only has a `start_time` will have `record_count = 1` (an active game). A game that also has an `end_time` will have `record_count = 2` (a completed game).
-*   The outer `SELECT SUM(CASE WHEN record_count = 1 THEN 1 ELSE 0 END) ...` then sums these up to give us the total active and completed game counts.
-*   `.collect()` starts a continuous stream of results. As soon as a new game starts or ends (and new data arrives in Kafka), Flink re-calculates, and a new `result` is sent.
-*   `yield (result)` means this function doesn't return just one answer; it keeps providing new answers as they become available.
+
+- `self.table_env.execute_sql(...)` tells Flink to run a SQL query.
+- The inner `SELECT game_id, COUNT(*) record_count FROM games GROUP BY game_id` counts how many events (`start_time` and `end_time`) exist for each `game_id`. A game that only has a `start_time` will have `record_count = 1` (an active game). A game that also has an `end_time` will have `record_count = 2` (a completed game).
+- The outer `SELECT SUM(CASE WHEN record_count = 1 THEN 1 ELSE 0 END) ...` then sums these up to give us the total active and completed game counts.
+- `.collect()` starts a continuous stream of results. As soon as a new game starts or ends (and new data arrives in Kafka), Flink re-calculates, and a new `result` is sent.
+- `yield (result)` means this function doesn't return just one answer; it keeps providing new answers as they become available.
 
 Similarly, to get the list of recent moves, we simply select from the `moves` table:
 
@@ -1513,7 +1560,7 @@ Similarly, to get the list of recent moves, we simply select from the `moves` ta
             moves = []
             for result in results:
                 # Filter out initial dummy records
-                if result[1] != "dummy": 
+                if result[1] != "dummy":
                     moves.append(result)
                 # Convert to a Pandas DataFrame for Streamlit display
                 df = pd.DataFrame(
@@ -1548,6 +1595,7 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **Kafka Streams Events to Flink:** The [Kafka Event Bus](06_kafka_event_bus_.md) continuously sends new game and move events to the Flink Analytics Engine. Flink is always listening.
 2.  **Flink Processes Continuously:** Flink uses the "source tables" and "queries" we defined to constantly re-calculate statistics and update the list of recent moves as new data arrives. This happens automatically and in real-time.
 3.  **Workers Request Data:** The [Live Data Update Workers](08_live_data_update_workers_.md) (running as part of our [Streamlit Analytics Dashboard](03_streamlit_analytics_dashboard_.md)) periodically call `TableEnvCustomized`'s `get_games_stats()` and `get_moves()` methods.
@@ -1570,7 +1618,7 @@ Next up, we'll dive into the [Live Data Update Workers](08_live_data_update_work
 
 # Chapter 8: Live Data Update Workers
 
-Welcome back! In [Chapter 7: Flink Analytics Engine](07_flink_analytics_engine_.md), we learned how Apache Flink acts as our "data scientist," tirelessly analyzing the raw game and move data flowing through the [Kafka Event Bus](06_kafka_event_bus_.md) and preparing useful insights. But once Flink has calculated "3 active games" or "the last 5 moves," how does that information *actually get onto your screen* in the [Streamlit Analytics Dashboard](03_streamlit_analytics_dashboard_.md) and keep updating automatically?
+Welcome back! In [Chapter 7: Flink Analytics Engine](07_flink_analytics_engine_.md), we learned how Apache Flink acts as our "data scientist," tirelessly analyzing the raw game and move data flowing through the [Kafka Event Bus](06_kafka_event_bus_.md) and preparing useful insights. But once Flink has calculated "3 active games" or "the last 5 moves," how does that information _actually get onto your screen_ in the [Streamlit Analytics Dashboard](03_streamlit_analytics_dashboard_.md) and keep updating automatically?
 
 Imagine you're watching a news channel that needs to show live scores or breaking news. You don't want to press a "refresh" button every few seconds, right? You want the numbers and headlines to update by themselves, instantly. This is exactly the job of the **Live Data Update Workers**!
 
@@ -1583,7 +1631,7 @@ The **Live Data Update Workers** are like our dashboard's very own **"auto-refre
 Their main jobs are:
 
 1.  **Continuous Fetching:** They regularly ask the [Flink Analytics Engine](07_flink_analytics_engine_.md) for the very latest processed data (like updated game counts or new moves).
-2.  **Targeted Updating:** Each worker is responsible for updating a *specific* part of the Streamlit dashboard. One worker might update the "Game Statistics" numbers, another updates the "Recent Moves" list, and so on.
+2.  **Targeted Updating:** Each worker is responsible for updating a _specific_ part of the Streamlit dashboard. One worker might update the "Game Statistics" numbers, another updates the "Recent Moves" list, and so on.
 3.  **Real-Time Display:** By continuously fetching and updating, they ensure that the dashboard remains live and dynamic, without you ever needing to click a refresh button.
 
 These workers are implemented as `WorkerThread` classes in the `streamlit/utils/utils_worker.py` file. They use Python's `threading` feature to run multiple tasks at the same time, keeping your dashboard responsive.
@@ -1633,9 +1681,10 @@ except Exception:
 ```
 
 Here:
-*   `run_workers(...)` is the key function that creates and starts our "reporter" threads.
-*   It passes the `col1`, `col2`, `col4` (which are specific sections of our Streamlit dashboard page) to the workers, so each worker knows *where* on the dashboard to put its updates.
-*   It also passes `table_env` (our connection to the [Flink Analytics Engine](07_flink_analytics_engine_.md)), so workers can ask Flink for data.
+
+- `run_workers(...)` is the key function that creates and starts our "reporter" threads.
+- It passes the `col1`, `col2`, `col4` (which are specific sections of our Streamlit dashboard page) to the workers, so each worker knows _where_ on the dashboard to put its updates.
+- It also passes `table_env` (our connection to the [Flink Analytics Engine](07_flink_analytics_engine_.md)), so workers can ask Flink for data.
 
 <br>
 
@@ -1676,12 +1725,13 @@ class WorkerThread1(Thread):
 ```
 
 In this code:
-*   `class WorkerThread1(Thread):` declares this class as a background task.
-*   `self.target` is the specific placeholder in the Streamlit UI (e.g., `col1.empty()`) that this worker will update. `col1.empty()` creates an empty container that the worker can fill and re-fill.
-*   `self.table_env.get_games_stats()` is how this worker asks the [Flink Analytics Engine](07_flink_analytics_engine_.md) for the live game statistics. Remember from [Chapter 7](07_flink_analytics_engine_.md) that Flink's `collect()` method returns a continuous `stream` of results.
-*   `for chunk in stream:` This loop is crucial! It continuously waits for *new* data to arrive from Flink. As soon as Flink re-calculates and sends updated stats, this loop gets a `chunk` of data.
-*   `with self.target.container():` ensures that the Streamlit commands (`st.metric`) display their content *inside* the specific column (`col1`) assigned to this worker.
-*   `st.metric("Active Games", chunk[0])` displays a nice, big number (a "metric") labeled "Active Games" using the first piece of data (`chunk[0]`) from Flink.
+
+- `class WorkerThread1(Thread):` declares this class as a background task.
+- `self.target` is the specific placeholder in the Streamlit UI (e.g., `col1.empty()`) that this worker will update. `col1.empty()` creates an empty container that the worker can fill and re-fill.
+- `self.table_env.get_games_stats()` is how this worker asks the [Flink Analytics Engine](07_flink_analytics_engine_.md) for the live game statistics. Remember from [Chapter 7](07_flink_analytics_engine_.md) that Flink's `collect()` method returns a continuous `stream` of results.
+- `for chunk in stream:` This loop is crucial! It continuously waits for _new_ data to arrive from Flink. As soon as Flink re-calculates and sends updated stats, this loop gets a `chunk` of data.
+- `with self.target.container():` ensures that the Streamlit commands (`st.metric`) display their content _inside_ the specific column (`col1`) assigned to this worker.
+- `st.metric("Active Games", chunk[0])` displays a nice, big number (a "metric") labeled "Active Games" using the first piece of data (`chunk[0]`) from Flink.
 
 `WorkerThread2` works similarly but fetches recent moves and displays them as a table using `st.dataframe`.
 
@@ -1732,6 +1782,7 @@ sequenceDiagram
 ```
 
 In this flow:
+
 1.  **User Opens Dashboard:** You navigate to the Streamlit app in your web browser.
 2.  **Streamlit App Starts Workers:** The `app.py` script runs, sets up the page, and then calls `run_workers` to start the background worker threads.
 3.  **Workers Request Data from Flink:** Each "worker thread" (`WorkerThread1`, `WorkerThread2`, etc.) continuously asks the [Flink Analytics Engine](07_flink_analytics_engine_.md) (via the `table_env` object) for the latest processed data related to its specific task.
@@ -1772,10 +1823,11 @@ def run_workers(col1, col2, col3, col4, table_env):
 ```
 
 Here:
-*   `get_script_run_ctx()` gets the special "permission slip" from Streamlit's main thread.
-*   `add_script_run_ctx(thread, get_script_run_ctx())` then attaches this permission slip to each of our `WorkerThread` objects *before* they start. Without this, Streamlit would not allow the threads to modify the dashboard, and your page would never update!
-*   `thread.start()` actually begins the execution of the worker's `run()` method in a separate thread.
-*   `thread.join()` makes the main Streamlit program wait for these threads indefinitely, ensuring the dashboard keeps running and updating.
+
+- `get_script_run_ctx()` gets the special "permission slip" from Streamlit's main thread.
+- `add_script_run_ctx(thread, get_script_run_ctx())` then attaches this permission slip to each of our `WorkerThread` objects _before_ they start. Without this, Streamlit would not allow the threads to modify the dashboard, and your page would never update!
+- `thread.start()` actually begins the execution of the worker's `run()` method in a separate thread.
+- `thread.join()` makes the main Streamlit program wait for these threads indefinitely, ensuring the dashboard keeps running and updating.
 
 <br>
 
