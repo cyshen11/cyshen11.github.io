@@ -75,6 +75,8 @@ There are 2 functions in this component, `init_sharepoint_loader` and `load_docu
 
 `init_sharepoint_loader` function requires 2 parameters `DOCUMENT_LIBRARY_ID` and `FOLDER_ID` which I got it from this [documentation](https://python.langchain.com/docs/integrations/document_loaders/microsoft_sharepoint/){:target="\_blank"}. This function also read the `O365_TOKEN` in Streamlit secrets, convert it to JSON and save the JSON at this directory `Path.home() / ".credentials"`. This JSON will be used as token to initialize the SharePointLoader.
 
+Please ensure that `o365_token.txt` and the `.credentials` folder are added to your `.gitignore` file to prevent accidental leakage of sensitive tokens.
+
 ```python
 directory_path = Path.home() / ".credentials"
 
@@ -136,7 +138,7 @@ There is only 1 function in this [component](https://github.com/cyshen11/finance
 
 ## Step 5: Creating RAG
 
-I used LangGraph framework to build the RAG as it is simple to implement and suitable for this project.
+I utilized **LangGraph** to orchestrate the retrieval and generation state. While a linear chain would suffice for this MVP, LangGraph provides the infrastructure to easily add cyclic loops (e.g. query rewriting or self-correction) in future iterations.
 
 **Creating graph component**
 
@@ -175,22 +177,34 @@ Lastly, I deployed the app to Streamlit Community Cloud from my GitHub for free 
 
 ## Afterthoughts
 
-I took 1 week to develop this application. At the end of this project, I felt happy as I understand how to develop RAG using LangChain.
+Developing an enterprise-facing RAG application requires careful consideration of the entire data pipeline, particularly the choice of vector store and orchestration framework. This one-week sprint provided key insights into the operational challenges of building on a cloud-based stack.
 
-During my development, I tried using MongoDB to store the vector embeddings. However, I encountered issue where I couldn't retrieve the relevant documents.
+**Vector Store Evaluation: MongoBD vs. ChromaDB**
+
+Initial development explored using **MongoDB Atlas Vector Search** due to its scalability potential and unified data platform. However, performance testing revealed integration friction. Integrating MongoDB with the chosen orchestration framework, **LangChain/LangGraph**, required more complex custom wrappers compared to other native options. This led to a pivot to **ChromaDB**. The decision was based on its **seamless, native integration with LangChain**, offering a faster iteration cycle and significantly improved local I/O performance. For an MVP, ChromaDB proved to be the more reliable, low-friction solution.
+
+**Orchestration and Architecture**
+
+The decision to use **LangGraph** was strategic. While the current flow is a simple linear chain (Retrieve -> Generate), selecting LangGraph establishes a future-proof architecture. It provides the necessary infrastructure (State Graph) to easily implement complex, agentic behaviors in future enhancements, such as:
+- Self-Correction Loops: Allowing the LLM to rewrite a poor query and re-search the documents.
+- Tool Calling: Integrating other enterprise tools (e.g., Calendar APIs) into the RAG flow.
+
+**Security and Deployment Best Practices**
+
+Successfully deploying the application to the Streamlit Community Cloud enforced critical lessons in security and environment management:
+- Credential Management: The need to securely handle the Microsoft 365 token via the `Path.home() / ".credentials"` directory emphasized the importance of rigorous `.gitignore` practices to prevent credential leakage.
 
 **Lessons Learned**
 
-- What is RAG
-- How to build RAG using LangChain
-- What is vector database
-- How to build vector database using ChromaDB
-- How to deploy Streamlit application to Streamlit Community Cloud
+- Choosing a vector database is a trade-off between **deployment complexity** (MongoDB) and **development velocity/local performance** (ChromaDB).
+- **LangGraph** is the optimal choice for RAG systems where future complexity or agentic behavior is anticipated.
+- Robust **credential mangement** must be prioritized when dealing with enterprise data sources like SharePoint.
 
 **Future Enhancements**
 
 - Implement advanced search algorithms to improve document retrieval accuracy.
-- Improve UI/UX to inform user about the contents in the SharePoint
+- Improve UI/UX to display available SharePoint documents to the user
+- Parse the SharePoint URL to display a clean filename (e.g.,` 2024q3-alphabet.pdf`) instead of the full raw link.
 
 ## References
 
