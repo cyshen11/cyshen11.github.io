@@ -33,6 +33,11 @@ ninja.data = [{
           description: "Building a simple loan prediction web app",
           section: "Projects",handler: () => {
               window.location.href = "/projects/loan-prediction-app/";
+            },},{id: "projects-recipe-reviews-amp-user-feedback-analysis",
+          title: 'Recipe Reviews &amp;amp; User Feedback Analysis',
+          description: "Analyze recipe reviews and user feedback using Neo4j graph database",
+          section: "Projects",handler: () => {
+              window.location.href = "/projects/recipe-reviews-app/";
             },},{id: "projects-sharepoint-rag-app",
           title: 'SharePoint RAG App',
           description: "Building a simple SharePoint RAG app",
