@@ -46,7 +46,7 @@ The technology stack was carefully selected to balance functionality, ease of de
 
 ## Step 1: Setting up SQLite for Database
 
-I started by creating the database component [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/database.py){:target="\_blank"} to create SQLite database on-disk. To speed up the development, I used Amazon Q to generate the code and modified it.
+I started by creating the database component in [database.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/database.py){:target="\_blank"} to create SQLite database on-disk.
 
 There are 5 functions in this component, `create_tables`, `insert_ticker_data`, `create_database`, `test_database` and `check_db_exist`.
 
@@ -61,7 +61,7 @@ There are 5 functions in this component, `create_tables`, `insert_ticker_data`, 
 
 ## Step 2: Generating SQL query
 
-I developed the writer component [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/writer.py){:target="\_blank"} to generate SQL query.
+I developed the writer component in [writer.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/writer.py){:target="\_blank"} to generate SQL query.
 
 There are 2 functions, `init_llm` and `write_query`. There is 1 class `QueryOutput`.
 
@@ -83,7 +83,7 @@ For `write_query`, this function will
 
 ## Step 3: Executing SQL query
 
-I developed the executor component [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/executor.py){:target="\_blank"} to execute SQL query.
+I developed the executor component in [executor.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/executor.py){:target="\_blank"} to execute SQL query.
 
 There is only 1 function, `execute_query`. This function will
 
@@ -95,7 +95,7 @@ There is only 1 function, `execute_query`. This function will
 
 ## Step 4: Generating answers
 
-I developed the generator component [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/generator.py){:target="\_blank"} to generate an answer based on the query result in response to the user's question.
+I developed the generator component in [generator.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/generator.py){:target="\_blank"} to generate an answer based on the query result in response to the user's question.
 
 There is only 1 function, `generate_answer`. This function will
 
@@ -108,7 +108,7 @@ There is only 1 function, `generate_answer`. This function will
 
 ## Step 5: Creating RAG
 
-I referred to this [LangChain documentation](https://python.langchain.com/docs/tutorials/sql_qa/#human-in-the-loop){:target="\_blank"} Human-in-the-loop section to develop the graph component [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/graph.py){:target="\_blank"} to orchestrate the `writer`, `executor` and `generator` components. Below diagram shows the flow for the RAG whereby it will be interrupted before executing the query. It will continue executing the query once received input from the user.
+I referred to this [LangChain documentation](https://python.langchain.com/docs/tutorials/sql_qa/#human-in-the-loop){:target="\_blank"} Human-in-the-loop section to develop the graph component in [graph.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/graph.py){:target="\_blank"} to orchestrate the `writer`, `executor` and `generator` components. Below diagram shows the flow for the RAG whereby it will be interrupted before executing the query. It will continue executing the query once received input from the user.
 
 {% include figure.liquid loading="eager" path="assets/img/sql-rag-app/rag_flow.png" class="img-fluid rounded z-depth-1 w-25" alt="RAG Flow" %}
 (From [LangChain documentation](https://python.langchain.com/docs/tutorials/sql_qa/#human-in-the-loop){:target="\_blank"})
@@ -157,9 +157,7 @@ For `update_query`, I updated the graph state with the query to the `write_query
 self.graph.update_state(self.config, {"query": query}, as_node="write_query")
 ```
 
-I used Amazon Q to generate `string_tuples_to_markdown_table` and `extract_sql_headers` functions and modify them.
-
-Besides the `graph` component, I also developed the RAG state at [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/utils.py){:target="\_blank"}. The RAG state class is used by the RAG to keep track of its state. It is a class and has 4 attributes.
+Besides the `graph` component, I also developed the RAG state in [utils.py](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/components/utils.py){:target="\_blank"}. The RAG state class is used by the RAG to keep track of its state. It is a class and has 4 attributes.
 
 - `question`: User's question
 - `query`: SQL query
@@ -168,7 +166,7 @@ Besides the `graph` component, I also developed the RAG state at [here](https://
 
 ## Step 6: Creating user interface
 
-I developed a chatbot interface [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/pages/home.py){:target="\_blank"} based on [Streamlit Documentation](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps){:target="\_blank"}.
+The chatbot interface component is located [here](https://github.com/cyshen11/finance-chatbot/blob/main-sql-chatbot/pages/home.py){:target="\_blank"} based on [Streamlit Documentation](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps){:target="\_blank"}.
 
 Firstly, the app will check if the SQLite database exist. If it is not, it will create the database by calling `check_db_exist` function. It will also get the OpenAI API key from the environment which provided by the user in the sidebar input.
 
@@ -270,16 +268,15 @@ Lastly, I deployed the app to Streamlit Community Cloud from my GitHub for free 
 
 ## Afterthoughts
 
-I took 1 week to develop this application. At the end of this project, I felt amazed by how RAG is able to automate SQL database query. It might help the cold-start problem of querying the database.
+**The Risk of Autonomous SQL Execution** Building a "Text-to-SQL" system revealed a critical safety challenge: LLMs can hallucinate destructive queries (e.g., `DROP TABLE`) or syntactically incorrect SQL. To mitigate this, I implemented two layers of defense:
+1. **Architecutre**: A Human-in-the-loop (HITL) workflow using **LangGraph checkpoints**, requiring user approval before any SQL is executed.
+2. **Infrastructure**: Enforcing **Read-Only** database connections at the driver level to prevent data corruption.
 
-**Lessons Learned**
-
-- How to build a Question/Answering system over SQL data
-- How to build RAG with human-in-the-loop
-- How to build Streamlit chat interface
+**LangGraph for State Management** Unlike a standard RAG application, a SQL agent requires complex state management (tracking the generated query, user modifications, and execution results). **LangGraph** provided superior to linear chains here, allowing me to treat the "Modify Query" step as a cyclic node in the graph state, effectively enabling a conversation with the database. 
 
 **Future Enhancements**
 
+- Adding a Schema Explorer sidebar so users can see available columns (e.g., `NVDA`, `High`, `Volume`) before asking questions
 - Find actual use case for this project
 
 ## References
