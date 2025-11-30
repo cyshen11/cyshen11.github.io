@@ -8,7 +8,7 @@ category: machine-learning
 related_publications: false
 ---
 
-I designed this project with the purposes of using AWS RDS to host the data, AutoGluon for building Machine Learning model and Flask for the app. The use case for this project is to predict whether loan will be paid off.
+I designed this project with the purposes of using AWS RDS to host the data, AutoGluon for building Machine Learning model and Flask for the app. The use case for this project is to predict whether a loan will be paid off.
 
 {% include figure.liquid loading="eager" path="assets/img/loan-prediction-app/app_screenshot.png" class="img-fluid rounded z-depth-1" alt="Application Screenshot" %}
 
@@ -28,7 +28,7 @@ I designed this project with the purposes of using AWS RDS to host the data, Aut
 - Machine Learning: AutoGluon
 - Deployment: Render
 
-Flask was chosen for frontend as it was a popular app building framework for Python. RDS was chosen for the database as it is also a popular platform to deploy database. MariaDB variant was chosen due to my own familiarity. AutoGluon was chosen as the AutoML framework due to its popularity. Render was chosen as the deployment platform due to its low cost, and it includes recent Python libraries.
+Flask was chosen for frontend as it was a popular app building framework for Python. RDS was chosen for the database as it is also a popular platform to deploy database. MariaDB variant was chosen due to my own familiarity. AutoGluon was chosen for its **robust ensemble methods and ease of baseline benchmarking**. Render was chosen as the deployment platform due to its low cost, and it includes recent Python libraries.
 
 &nbsp;
 &nbsp;
@@ -52,7 +52,7 @@ I used MySQL Workbench to connect to the CTU Relational database and exported th
 
 ## Step 3: Setting up RDS Instance
 
-Next, I created a db.t4g.micro instance running MariaDB as this is under AWS free tier and is sufficient for this project. I set up a EC2 instance as a bastion host to connect to the RDS instance because the RDS instance is provisioned in private network. This is best practice as RDS instance should not be reachable over public network for security purpose. I connected to the RDS instance and uploaded the dataset.
+Next, I created a `db.t4g.micro` instance running MariaDB as this is under AWS free tier and is sufficient for this project. I set up a EC2 instance as a bastion host to connect to the RDS instance because the RDS instance is provisioned in private network. This is best practice as RDS instance should not be reachable over public network for security purpose. I connected to the RDS instance and uploaded the dataset.
 
 ## Step 4: EDA
 
@@ -68,7 +68,7 @@ To train the model on the dataset, all the dataset was exported from RDS to S3. 
 
 ## Step 6: Feature Engineering
 
-Initially, I tried to create the features myself and train the model. However, the result was not satisfactory as it always predicts that the loan will be paid off. Hence, I used the features from this [article](https://medium.com/data-science/loan-default-prediction-an-end-to-end-ml-project-with-real-bank-data-part-1-1405f7aecb9e#ed0c){:target="\_blank"} by Zhou (Joe) Xu.
+Initial manual feature engineering yielded poor separation. I adopted a proven feature set (attributed to [Zhou Xu](https://medium.com/data-science/loan-default-prediction-an-end-to-end-ml-project-with-real-bank-data-part-1-1405f7aecb9e#ed0c)), focusing on temporal aggregations like `days_between` (loan date vs. account creation) and financial velocity metrics like `avg_trans_amount`.
 
 Below are the features used to create the prediction model
 
@@ -155,18 +155,17 @@ Now the app is reachable from [here](https://loan-prediction-app.vincentcys.com/
 
 ## Afterthoughts
 
-I took about 4 months to complete this project due to other personal commitments. At the end of this project, I felt satisfied that I had learned a lot: RDS, Flask, AutoML, and Serverless App development.
+**Full-Stack ML Engineering Challenges** Integrating a secure cloud database with a modern ML pipeline revealed the complexity of end-to-end development. The primary challenge was **deployment constraints**: high-performance AutoML libraries like AutoGluon generate large model artifacts that exceed the limits of standard serverless functions (AWS Lambda).
 
 **Lessons Learned**
-
-- How to provision RDS
-- How to build Machine Learning model from Relational Database
-- How to create Flask app
-- How to use AutoML
-- How to create a Serverless App using AWS SAM
+- **Infrastructure Security**: Configuring a Bastion Host to access a private RDS instance is critical for production security, though it introduces latency during the EDA phase.
+- **Model Trade-offs**: While AutoGluon accelerated training, its heavy footprint required a containerized deployment (Render/Docker) rather than serverless one.
+- **Imbalanced Data**: The high accuracy but low recall score highlights the need for advanced handling of class imbalance (e.g., SMOTE) in future iterations.
 
 **Future Enhancements**
 
+- Apply SMOTE (Synthetic Minority Over-sampling Technique) or adjust the **clas weights** to prioritize Recall over Accuracy
 - Improve app UI & UX
 - Improve the robustness of prediction model
 - Change it to serverless app by using different ML framework
+- Migrate to a serverless architecture (AWS Lambda) by refactoring the model from AutoGluon to a lightweight framework like **Scikit-Learn** or **ONNX runtime** to meet package size constraints
